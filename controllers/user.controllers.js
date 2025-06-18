@@ -197,12 +197,7 @@ const usercontroller = {
       await Sendmail(email, htmltemplate, "Reset Password");
 
       res
-        .cookie("Password_Reset_Token", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "None",
-          maxAge: 15 * 60 * 1000,
-        })
+        .cookie("Password_Reset_Token", token)
         .status(200)
         .json({ message: "Reset password email sent successfully" });
     } catch (error) {
@@ -263,11 +258,7 @@ const usercontroller = {
   },
   logout: async (req, res) => {
     try {
-      res.clearCookie("access_token", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      });
+      res.clearCookie("access_token");
 
       res.status(200).json({ message: "User logged out successfully" });
     } catch (error) {
