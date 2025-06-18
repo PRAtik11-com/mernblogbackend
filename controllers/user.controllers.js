@@ -31,7 +31,12 @@ const usercontroller = {
       let result = await Sendmail(email, htmltemplate, "Verification Otp");
 
       res
-        .cookie("verfication_token", token)
+        .cookie("verfication_token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+          maxAge: 15 * 60 * 1000,
+        })
         .status(200)
         .json({ message: "Otp send ..." });
     } catch (error) {
@@ -106,12 +111,16 @@ const usercontroller = {
       return res.status(400).json({ message: "Token not generated" });
     }
     res
-      .cookie("access_token", token ,{httpOnly: true,maxAge: 604800000})
+      .cookie("access_token", token, {
+        httpOnly: true,
+        maxAge: 604800000,
+        secure: true,
+        sameSite: "None",
+      })
       .status(200)
       .json({ message: "User logged in successfully", user: rest });
   },
 
-  
   getUserData: async (req, res) => {
     // if (req.params.userId !== req.user._id) {
     //   return res.status(400).json({ message: "You are not authorized" });
@@ -135,26 +144,32 @@ const usercontroller = {
     if (!req.file) {
       const updateprofile = await UserModel.findByIdAndUpdate(
         req.params.userId,
-        { $set: { ...req.body } },{new:true}
+        { $set: { ...req.body } },
+        { new: true }
       );
       if (!updateprofile) {
         return res
           .status(400)
           .json({ message: "Error while updating profile" });
       }
-      res.status(200).json({ message: "Data updated successfully" ,user:updateprofile});
+      res
+        .status(200)
+        .json({ message: "Data updated successfully", user: updateprofile });
     }
     if (req.file) {
       const updateprofile = await UserModel.findByIdAndUpdate(
         req.params.userId,
-        { $set: { ...req.body, profileImage: req.file.originalname } },{new:true}
+        { $set: { ...req.body, profileImage: req.file.originalname } },
+        { new: true }
       );
       if (!updateprofile) {
         return res
           .status(400)
           .json({ message: "Error while updating profile" });
       }
-      res.status(200).json({ message: "Data updated successfully" ,user:updateprofile});
+      res
+        .status(200)
+        .json({ message: "Data updated successfully", user: updateprofile });
     }
   },
   resetPasswordByEmail: async (req, res) => {
@@ -182,7 +197,12 @@ const usercontroller = {
       await Sendmail(email, htmltemplate, "Reset Password");
 
       res
-        .cookie("Password_Reset_Token", token)
+        .cookie("Password_Reset_Token", token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "None",
+          maxAge: 15 * 60 * 1000,
+        })
         .status(200)
         .json({ message: "Reset password email sent successfully" });
     } catch (error) {
@@ -243,48 +263,46 @@ const usercontroller = {
   },
   logout: async (req, res) => {
     try {
-      res.clearCookie("access_token")
+      res.clearCookie("access_token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
       res.status(200).json({ message: "User logged out successfully" });
     } catch (error) {
-      res.status(400).json({message:error.message})
+      res.status(400).json({ message: error.message });
     }
-    
   },
 
   // admin side
-  getAllUsers:async(req,res)=>{
+  getAllUsers: async (req, res) => {
     // logic for getting all users
     const limit = req.query.limit || 2;
-   try {
-    const users = await UserModel.find().select("-password").limit(limit)
-    const totalUsers = await UserModel.countDocuments()
-    if(!users){
-      return res.status(400).json({message:"No user found"})
+    try {
+      const users = await UserModel.find().select("-password").limit(limit);
+      const totalUsers = await UserModel.countDocuments();
+      if (!users) {
+        return res.status(400).json({ message: "No user found" });
+      }
+      res.status(200).json({ message: "All users", users, totalUsers });
+    } catch (error) {
+      res.status(400).json({ message: error?.message });
     }
-    res.status(200).json({message:"All users",users,totalUsers})
-    
-   } catch (error) {
-     res.status(400).json({message:error?.message})
-    
-   }
   },
-  deleteUserByAdmin:async(req,res)=>{
-    if(!req.params.userId){
-      return res.status(400).json({message:"Please provide userId"})
+  deleteUserByAdmin: async (req, res) => {
+    if (!req.params.userId) {
+      return res.status(400).json({ message: "Please provide userId" });
     }
     try {
-      const user = await UserModel.findByIdAndDelete(req.params.userId)
-      if(!user){
-        return res.status(400).json({message:"User not found"})
+      const user = await UserModel.findByIdAndDelete(req.params.userId);
+      if (!user) {
+        return res.status(400).json({ message: "User not found" });
       }
-      res.status(200).json({message:"User deleted successfully",user})
-      
+      res.status(200).json({ message: "User deleted successfully", user });
     } catch (error) {
-      res.status(400).json({message:error?.message})
-      
+      res.status(400).json({ message: error?.message });
     }
-
-  }
+  },
 };
 
 module.exports = usercontroller;
