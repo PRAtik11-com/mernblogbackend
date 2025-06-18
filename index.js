@@ -1,5 +1,5 @@
 const express = require("express");
-const connection = require("./config/db");
+// const connection = require("./config/db");
 const cors = require("cors");
 const userRouter = require("./routes/user.routes");
 require("dotenv").config();
@@ -7,6 +7,7 @@ var cookieParser = require("cookie-parser");
 const postRouter = require("./routes/post.routes");
 const commentRouter = require("./routes/comment.routes");
 const path = require("path");
+const connection = require("./config/db");
 
 const app = express();
 app.set("view engine", "ejs");
