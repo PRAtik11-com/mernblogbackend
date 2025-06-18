@@ -17,7 +17,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:5174",
-      "https://mernblogfrontend-two.vercel.app/",
+      "https://mernblogfrontend-two.vercel.app",
       "https://mernblogfrontend-1ngv0nctj-pratik-amrutkars-projects.vercel.app",
     ],
     credentials: true,

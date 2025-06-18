@@ -265,15 +265,15 @@ const usercontroller = {
     try {
       res.clearCookie("access_token", {
         httpOnly: true,
-        secure: true,
-        sameSite: "None",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       });
+
       res.status(200).json({ message: "User logged out successfully" });
     } catch (error) {
-      res.status(400).json({ message: error.message });
+      res.status(500).json({ message: error.message });
     }
   },
-
   // admin side
   getAllUsers: async (req, res) => {
     // logic for getting all users
